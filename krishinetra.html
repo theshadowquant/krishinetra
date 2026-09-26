@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>KrishiNetra | Smart Agriculture Rover</title>
+    <style>
+        :root {
+            --green: #0b6b4b;
+            --dark: #073f31;
+            --mint: #eaf7f0;
+            --line: #dce9e2;
+            --text: #173b2e;
+            --muted: #6b7f76;
+            --red: #d94b4b;
+            --amber: #e2a52e
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            background: #f4f8f6;
+            color: var(--text)
+        }
+
+        header {
+            height: 72px;
+            background: white;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 5
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .leaf {
+            font-size: 34px
+        }
+
+        .brand h1 {
+            margin: 0;
+            color: var(--dark);
+            font-size: 25px
+        }
+
+        .brand small {
+            color: var(--muted)
+        }
+
+        .connection {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #25a968
+        }
+
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 72px)
+        }
+
+        aside {
+            width: 225px;
+            background: var(--dark);
+            color: white;
+            padding: 22px 14px
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 7px
+        }
+
+        .nav button {
+            border: 0;
+            background: transparent;
+            color: #d7eee4;
+            text-align: left;
+            padding: 13px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px
+        }
+
+        .nav button:hover,
+        .nav button.active {
+            background: #0b6b4b;
+            color: white
+        }
+
+        .nav span {
+            margin-right: 10px
+        }
+
+        main {
+            flex: 1;
+            padding: 25px;
+            max-width: 1500px;
+            margin: auto;
+            width: 100%
+        }
+
+        .page {
+            display: none
+        }
+
+        .page.active {
+            display: block
+        }
+
+        .title {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            margin-bottom: 20px
+        }
+
+        .title h2 {
+            margin: 0 0 5px
+        }
+
+        .title p {
+            margin: 0;
+            color: var(--muted)
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px
+        }
+
+        .sensors {
+            grid-template-columns: repeat(4, 1fr)
+        }
+
+        .two {
+            grid-template-columns: 1.55fr 1fr
+        }
+
+        .three {
+            grid-template-columns: repeat(3, 1fr)
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            padding: 18px;
+            box-shadow: 0 3px 14px #153b2d0a
+        }
+
+        .card h3 {
+            margin: 0 0 14px;
+            font-size: 16px
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 13px
+        }
+
+        .metric .ico {
+            font-size: 27px;
+            background: var(--mint);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center
+        }
+
+        .metric small {
+            color: var(--muted)
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 23px;
+            margin-top: 3px
+        }
+
+        .camera {
+            background: #071c15;
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 380px;
+            position: relative
+        }
+
+        .camera img {
+            width: 100%;
+            height: 380px;
+            object-fit: cover;
+            display: block
+        }
+
+        .camera .offline {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            background: #10271f
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #e8f6ee;
+            color: #16834d;
+            font-weight: 700
+        }
+
+        .badge.red {
+            background: #fdeaea;
+            color: #c33
+        }
+
+        .health {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: #edf9f1;
+            border-radius: 12px;
+            padding: 15px
+        }
+
+        .health .circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #27a765;
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 23px
+        }
+
+        .control {
+            text-align: center
+        }
+
+        .pad {
+            width: 220px;
+            height: 210px;
+            position: relative;
+            margin: 15px auto
+        }
+
+        .pad button {
+            position: absolute;
+            width: 62px;
+            height: 62px;
+            border: 0;
+            border-radius: 13px;
+            background: var(--green);
+            color: #fff;
+            font-size: 23px;
+            cursor: pointer
+        }
+
+        .pad .up {
+            top: 0;
+            left: 79px
+        }
+
+        .pad .left {
+            top: 74px;
+            left: 0
+        }
+
+        .pad .stop {
+            top: 74px;
+            left: 79px;
+            background: var(--red)
+        }
+
+        .pad .right {
+            top: 74px;
+            right: 0
+        }
+
+        .pad .down {
+            bottom: 0;
+            left: 79px
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px
+        }
+
+        .actions button,
+        .export {
+            flex: 1;
+            border: 0;
+            border-radius: 9px;
+            padding: 11px;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--green)
+        }
+
+        .actions .danger {
+            background: var(--red)
+        }
+
+        .switchrow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .history-tools {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px
+        }
+
+        .history-tools button {
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 700
+        }
+
+        .export {
+            flex: none
+        }
+
+        .clear {
+            background: #fdeaea;
+            color: #b32d2d
+        }
+
+        .tablewrap {
+            overflow: auto;
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 12px
+        }
+
+        .historytable {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px
+        }
+
+        .historytable th,
+        .historytable td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--line);
+            font-size: 13px
+        }
+
+        .historytable th {
+            background: #f0f7f3;
+            color: var(--dark)
+        }
+
+        .stat {
+            font-size: 28px;
+            font-weight: 800
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            padding: 25px
+        }
+
+        @media(max-width:1000px) {
+            aside {
+                width: 75px
+            }
+
+            .nav button {
+                font-size: 0;
+                text-align: center
+            }
+
+            .nav span {
+                margin: 0;
+                font-size: 19px
+            }
+
+            .sensors {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .two,
+            .three {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:600px) {
+            header {
+                padding: 0 15px
+            }
+
+            .brand small {
+                display: none
+            }
+
+            main {
+                padding: 15px
+            }
+
+            .sensors {
+                grid-template-columns: 1fr
+            }
+
+            aside {
+                display: none
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="brand">
+            <div class="leaf">🌿</div>
+            <div>
+                <h1>KrishiNetra</h1><small>Smart Mobile Rover • Precision Agriculture</small>
+            </div>
+        </div>
+        <div class="connection"><span class="dot" id="connDot"></span><span id="connText">ESP32 ONLINE</span></div>
+    </header>
+
+    <div class="layout">
+        <aside>
+            <nav class="nav">
+                <button class="active" onclick="showPage('dashboard',this)"><span>⌂</span>Dashboard</button>
+                <button onclick="showPage('camera',this)"><span>📷</span>Live Camera</button>
+                <button onclick="showPage('history',this)"><span>▣</span>Saved Data</button>
+                <button onclick="showPage('control',this)"><span>🚜</span>Rover Control</button>
+            </nav>
+        </aside>
+
+        <main>
+            <section id="dashboard" class="page active">
+                <div class="title">
+                    <div>
+                        <h2>Field Monitoring Dashboard</h2>
+                        <p>Real-time crop condition, irrigation and rover status</p>
+                    </div><span class="badge">● SYSTEM READY</span>
+                </div>
+
+                <div class="grid sensors">
+                    <div class="card metric">
+                        <div class="ico">💧</div>
+                        <div><small>Soil Moisture</small><strong id="soil">--%</strong></div>
+                    </div>
+                    <div class="card metric">
+                        <div class="ico">🌡️</div>
+                        <div><small>Temperature</small><strong id="temp">--°C</strong></div>
+                    </div>
+                    <div class="card metric">
+                        <div class="ico">💦</div>
+                        <div><small>Humidity</small><strong id="hum">--%</strong></div>
+                    </div>
+                    <div class="card metric">
+                        <div class="ico">🌱</div>
+                        <div><small>Plant Condition</small><strong id="plant">Checking</strong></div>
+                    </div>
+                </div>
+
+                <br>
+                <div class="grid two">
+                    <div class="card">
+                        <div class="title">
+                            <div>
+                                <h3>ESP32-CAM • Live Plant Vision</h3>
+                                <p>Leaf / crop observation</p>
+                            </div><span class="badge" id="camBadge">● LIVE</span>
+                        </div>
+                        <div class="camera"><img id="cam" src="http://192.168.4.2/stream" onerror="cameraOffline()">
+                            <div id="camOff" class="offline" style="display:none">
+                                <div style="font-size:45px">📷</div><b>ESP32-CAM Offline</b><small>Set the correct
+                                    camera IP</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card">
+                            <h3>🌿 Plant Health Assessment</h3>
+                            <div class="health">
+                                <div class="circle">✓</div>
+                                <div><b id="healthTitle">Healthy</b>
+                                    <p class="muted" id="healthMsg">Monitoring soil and environmental conditions.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="card">
+                            <h3>💦 Irrigation</h3>
+                            <div class="switchrow"><span>Pump status</span><b id="pump">OFF</b></div>
+                            <div class="switchrow"><span>Control mode</span><b>AUTOMATIC</b></div>
+                            <div class="switchrow"><span>Threshold</span><b>35%</b></div>
+                            <br>
+                            <div class="actions"><button onclick="pump('on')">START</button><button class="danger"
+                                    onclick="pump('off')">STOP</button></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="camera" class="page">
+                <div class="title">
+                    <div>
+                        <h2>Live Camera</h2>
+                        <p>ESP32-CAM plant and field observation</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="camera" style="min-height:600px"><img id="cam2" src="http://192.168.4.2/stream"
+                            style="height:600px;object-fit:contain" onerror="cameraOffline2()">
+                        <div id="camOff2" class="offline" style="display:none">
+                            <div style="font-size:55px">📷</div><b>ESP32-CAM Offline</b>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="history" class="page">
+                <div class="title">
+                    <div>
+                        <h2>Saved Sensor Data</h2>
+                        <p>Historical readings saved locally in this browser</p>
+                    </div>
+                </div>
+                <div class="grid three">
+                    <div class="card"><small class="muted">Total records</small>
+                        <div class="stat" id="recordCount">0</div>
+                    </div>
+                    <div class="card"><small class="muted">Average soil moisture</small>
+                        <div class="stat" id="avgSoil">--%</div>
+                    </div>
+                    <div class="card"><small class="muted">Pump events</small>
+                        <div class="stat" id="pumpEvents">0</div>
+                    </div>
+                </div>
+                <br>
+                <div class="card">
+                    <div class="history-tools"><button class="export" onclick="exportCSV()">⬇ Export CSV</button><button
+                            class="clear" onclick="clearHistory()">Clear Saved Data</button></div>
+                    <div class="tablewrap">
+                        <table class="historytable">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Soil %</th>
+                                    <th>Temperature °C</th>
+                                    <th>Humidity %</th>
+                                    <th>Plant</th>
+                                    <th>Pump</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="control" class="page">
+                <div class="title">
+                    <div>
+                        <h2>Rover Control</h2>
+                        <p>Manual movement and irrigation controls</p>
+                    </div>
+                </div>
+                <div class="grid two">
+                    <div class="card control">
+                        <h3>🚜 Direction Control</h3>
+                        <div class="pad">
+                            <button class="up" onclick="move('forward')">▲</button><button class="left"
+                                onclick="move('left')">◀</button><button class="stop"
+                                onclick="move('stop')">■</button><button class="right"
+                                onclick="move('right')">▶</button><button class="down"
+                                onclick="move('backward')">▼</button>
+                        </div><b id="moveStatus">Rover stopped</b>
+                    </div>
+                    <div class="card">
+                        <h3>System Status</h3>
+                        <div class="switchrow"><span>Main ESP32</span><b class="badge">ONLINE</b></div>
+                        <div class="switchrow"><span>ESP32-CAM</span><b id="camSystem" class="badge">ONLINE</b></div>
+                        <div class="switchrow"><span>Soil sensor</span><b class="badge">ACTIVE</b></div>
+                        <div class="switchrow"><span>DHT11</span><b class="badge">ACTIVE</b></div>
+                        <div class="switchrow"><span>LDR</span><b>REMOVED</b></div>
+                    </div>
+                </div>
+            </section>
+
+            <footer>🌿 <b>KrishiNetra</b> • Healthy Crops • Smart Farming • Sustainable Future</footer>
+        </main>
+    </div>
+
+    <script>
+        const ESP32_IP = "192.168.4.1";
+        const HISTORY_KEY = "krishinetra_sensor_history_v1";
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+
+        function showPage(id, btn) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); if (id === 'history') renderHistory() }
+
+        function move(dir) {
+            document.getElementById('moveStatus').textContent = "Command: " + dir.toUpperCase();
+            fetch(`http://${ESP32_IP}/move?dir=${dir}`).catch(() => { });
+        }
+        function pump(state) {
+            document.getElementById('pump').textContent = state.toUpperCase();
+            fetch(`http://${ESP32_IP}/pump?state=${state}`).catch(() => { });
+        }
+        function cameraOffline() {
+            document.getElementById('camOff').style.display = 'flex';
+            document.getElementById('camBadge').textContent = '● OFFLINE';
+            document.getElementById('camBadge').className = 'badge red';
+            document.getElementById('camSystem').textContent = 'OFFLINE';
+        }
+        function cameraOffline2() { document.getElementById('camOff2').style.display = 'flex' }
+
+        function saveReading(data) {
+            const row = { time: new Date().toLocaleString(), soil: Number(data.soil) || 0, temp: Number(data.temperature) || 0, hum: Number(data.humidity) || 0, plant: data.plant || 'Unknown', pump: !!data.pump };
+            history.push(row);
+            if (history.length > 5000) history = history.slice(-5000);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        }
+
+        async function updateSensors() {
+            try {
+                const r = await fetch(`http://${ESP32_IP}/api/status`, { cache: 'no-store' });
+                const d = await r.json();
+                document.getElementById('connText').textContent = 'ESP32 ONLINE';
+                document.getElementById('soil').textContent = d.soil + '%';
+                document.getElementById('temp').textContent = d.temperature + '°C';
+                document.getElementById('hum').textContent = d.humidity + '%';
+                document.getElementById('plant').textContent = d.plant || 'Healthy';
+                document.getElementById('pump').textContent = d.pump ? 'ON' : 'OFF';
+                const dry = Number(d.soil) < 35;
+                document.getElementById('healthTitle').textContent = dry ? 'Needs Irrigation' : 'Healthy';
+                document.getElementById('healthMsg').textContent = dry ? 'Soil moisture is below the irrigation threshold.' : 'Soil and environmental readings are within the current target range.';
+                saveReading(d);
+            } catch (e) {
+                document.getElementById('connText').textContent = 'ESP32 OFFLINE';
+                document.getElementById('connDot').style.background = '#d94b4b';
+            }
+        }
+        function renderHistory() {
+            const body = document.getElementById('historyBody');
+            body.innerHTML = history.slice().reverse().map(x => `<tr><td>${x.time}</td><td>${x.soil}</td><td>${x.temp}</td><td>${x.hum}</td><td>${x.plant}</td><td>${x.pump ? 'ON' : 'OFF'}</td></tr>`).join('');
+            document.getElementById('recordCount').textContent = history.length;
+            const avg = history.length ? history.reduce((a, x) => a + x.soil, 0) / history.length : 0;
+            document.getElementById('avgSoil').textContent = history.length ? avg.toFixed(1) + '%' : '--%';
+            document.getElementById('pumpEvents').textContent = history.filter(x => x.pump).length;
+        }
+        function clearHistory() { if (confirm('Delete all locally saved KrishiNetra data?')) { history = []; localStorage.removeItem(HISTORY_KEY); renderHistory() } }
+        function exportCSV() {
+            if (!history.length) { alert('No saved data yet.'); return }
+            const rows = [['Time', 'Soil Moisture %', 'Temperature °C', 'Humidity %', 'Plant', 'Pump'], ...history.map(x => [x.time, x.soil, x.temp, x.hum, x.plant, x.pump ? 'ON' : 'OFF'])];
+            const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(',')).join('\n');
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'KrishiNetra_sensor_history.csv'; a.click(); URL.revokeObjectURL(a.href);
+        }
+        setInterval(updateSensors, 3000); updateSensors();
+    </script>
+</body>
+
+</html>
